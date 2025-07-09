@@ -1,212 +1,339 @@
-/* Global Styles */
+/* General Styles & Dark Mode */
+:root {
+    --bg-color: #282c34;
+    --primary-color: #61dafb; /* A light blue for accents */
+    --secondary-color: #4CAF50; /* Green for success/save */
+    --text-color: #e6e6e6;
+    --card-bg-color: #3a3f4a;
+    --border-color: #444b56;
+    --button-bg-primary: #61dafb;
+    --button-text-primary: #282c34;
+    --button-bg-secondary: #4CAF50;
+    --button-text-secondary: white;
+    --button-bg-danger: #e74c3c;
+    --button-text-danger: white;
+    --button-outline-border: #7f8c8d;
+    --button-outline-text: #7f8c8d;
+    --alert-bg-error: #e74c3c;
+    --alert-text-error: white;
+    --alert-bg-success: #2ecc71;
+    --alert-text-success: white;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Kanit', sans-serif;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f7f6;
-    color: #333;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top */
 }
 
 .container {
-    max-width: 800px;
-    margin: 20px auto;
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 h1, h2 {
-    color: #2c3e50;
+    color: var(--primary-color);
     text-align: center;
     margin-bottom: 25px;
+    font-weight: 600;
 }
 
-/* Form Section */
-.form-section {
-    background-color: #ecf0f1;
-    padding: 25px;
-    border-radius: 8px;
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 30px;
 }
 
+.app-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    text-align: left;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+    color: var(--primary-color);
+}
+
+/* App Sections */
+.app-section {
+    background-color: var(--card-bg-color);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.app-section.hidden {
+    display: none;
+}
+
+/* Form Styles */
+.form-section {
+    padding: 15px 0;
+}
+
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: bold;
-    color: #34495e;
+    font-weight: 400;
+    color: var(--text-color);
 }
 
 .form-group input[type="date"],
 .form-group input[type="time"],
-.form-group input[type="text"] {
-    width: calc(100% - 20px);
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: 100%;
     padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 1rem;
-    box-sizing: border-box; /* Ensures padding doesn't add to total width */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    box-sizing: border-box;
+    -webkit-appearance: none; /* Remove default browser styling for inputs */
+    appearance: none;
 }
 
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes calendar icon visible in dark mode */
+}
+.form-group input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes clock icon visible in dark mode */
+}
+
+
+/* Buttons */
 .btn {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     padding: 12px 25px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
     text-align: center;
+    margin-top: 10px;
 }
 
 .btn-primary {
-    background-color: #2ecc71;
-    color: white;
-    width: 100%;
+    background-color: var(--button-bg-primary);
+    color: var(--button-text-primary);
 }
 
 .btn-primary:hover {
-    background-color: #27ae60;
+    background-color: #4ac1e8;
+    transform: translateY(-1px);
 }
 
-/* Summary Section */
-.summary-section {
-    margin-bottom: 30px;
-    text-align: center;
+.btn-secondary {
+    background-color: var(--button-bg-secondary);
+    color: var(--button-text-secondary);
 }
 
-.summary-filter {
-    margin-bottom: 20px;
+.btn-secondary:hover {
+    background-color: #449d48;
+    transform: translateY(-1px);
 }
 
-.summary-filter .btn {
-    background-color: #bdc3c7;
-    color: #333;
-    margin: 0 5px;
-    padding: 10px 20px;
+.btn-outline {
+    background: none;
+    border: 2px solid var(--button-outline-border);
+    color: var(--button-outline-text);
 }
 
-.summary-filter .btn.active {
-    background-color: #3498db;
-    color: white;
+.btn-outline:hover {
+    background-color: rgba(127, 140, 141, 0.1);
+    transform: translateY(-1px);
 }
 
-.summary-filter .btn:hover:not(.active) {
-    background-color: #aeb6bf;
+.btn-icon {
+    font-size: 1.4rem;
+    margin-right: 8px;
+    line-height: 1; /* Aligns icon vertically */
 }
 
-#ot-summary-display {
-    background-color: #e8f6f3;
+
+/* Summary Cards */
+.summary-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.summary-card {
+    background-color: var(--bg-color);
     padding: 20px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    color: #2c3e50;
-    text-align: left;
+    border-radius: 10px;
+    flex: 1 1 calc(33% - 20px); /* Approx 3 cards per row, responsive */
+    min-width: 150px; /* Minimum width for cards */
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-#ot-summary-display p {
-    margin: 8px 0;
-}
-
-/* Record List Section */
-.record-list-section {
-    margin-top: 30px;
-}
-
-#ot-list {
-    list-style: none;
-    padding: 0;
-}
-
-#ot-list li {
-    background-color: #f7f9fa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
+.summary-card h3 {
+    margin-top: 10px;
     margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+    font-size: 1.2rem;
 }
 
-#ot-list li span {
-    flex: 1;
-    color: #555;
+.summary-card p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+    color: var(--text-color);
 }
 
-#ot-list li .ot-details {
-    display: flex;
-    flex-direction: column;
+.summary-card .card-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+/* OT History Table */
+.ot-history-table {
+    overflow-x: auto; /* Enable horizontal scrolling on small screens */
+    margin-top: 20px;
+}
+
+.ot-history-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px; /* Ensure table doesn't get too squished */
+}
+
+.ot-history-table th,
+.ot-history-table td {
+    padding: 12px 8px;
     text-align: left;
-}
-
-#ot-list li .ot-details strong {
-    color: #2c3e50;
-    font-size: 1.1em;
-}
-
-#ot-list li .ot-details small {
-    color: #777;
-    font-size: 0.9em;
-}
-
-.delete-btn {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
     font-size: 0.9rem;
-    transition: background-color 0.3s ease;
+    vertical-align: middle;
 }
 
-.delete-btn:hover {
+.ot-history-table th {
+    color: var(--primary-color);
+    font-weight: 600;
+    background-color: #343840; /* Slightly darker header */
+}
+
+.ot-history-table tbody tr:hover {
+    background-color: #31353c; /* Slightly lighter on hover */
+}
+
+.ot-history-table td .delete-btn {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    background-color: var(--button-bg-danger);
+    color: var(--button-text-danger);
+    margin: 0;
+}
+
+.ot-history-table td .delete-btn:hover {
     background-color: #c0392b;
 }
 
-/* Responsive Design */
+.text-center {
+    text-align: center;
+    color: #a0a0a0;
+    padding: 20px 0;
+}
+
+/* Alerts */
+.app-alert {
+    background-color: var(--alert-bg-error);
+    color: var(--alert-text-error);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+    display: block; /* Default to block, hide with hidden class */
+}
+
+.app-alert.hidden {
+    display: none;
+}
+
+.app-alert.success {
+    background-color: var(--alert-bg-success);
+    color: var(--alert-text-success);
+}
+
+
+/* Responsive Adjustments */
 @media (max-width: 600px) {
     .container {
         padding: 15px;
-        margin: 10px auto;
     }
 
-    .form-group input[type="date"],
-    .form-group input[type="time"],
-    .form-group input[type="text"] {
-        width: 100%;
-        padding: 10px;
+    .app-header h1 {
+        font-size: 1.5rem;
     }
 
-    .btn-primary {
-        padding: 10px;
+    .icon-btn {
+        font-size: 1.5rem;
     }
 
-    .summary-filter .btn {
-        margin: 5px 2px;
-        padding: 8px 15px;
-        font-size: 0.9rem;
+    h2 {
+        font-size: 1.4rem;
     }
 
-    #ot-list li {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px;
+    .summary-cards {
+        flex-direction: column; /* Stack cards on small screens */
     }
 
-    #ot-list li .ot-details {
-        margin-bottom: 10px;
+    .summary-card {
+        flex: 1 1 100%;
+        min-width: unset;
     }
 
-    .delete-btn {
-        width: 100%;
-        margin-top: 10px;
+    .ot-history-table table {
+        min-width: 400px; /* Allow table to shrink slightly more */
+    }
+
+    .ot-history-table th,
+    .ot-history-table td {
+        font-size: 0.85rem;
+        padding: 10px 5px;
+    }
+
+    .ot-history-table td .delete-btn {
+        padding: 5px 8px;
     }
 }

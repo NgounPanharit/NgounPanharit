@@ -12,59 +12,59 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- UI Elements ---
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsSection = document.getElementById('settings-section');
+    const summarySection = document.getElementById('summary-section');
+    const addOtSection = document.getElementById('add-ot-section');
+    const historySection = document.getElementById('history-section');
+    const hourlyRateInput = document.getElementById('hourly-rate');
+    const otMultiplierInput = document.getElementById('ot-multiplier');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
     const otForm = document.getElementById('ot-form');
     const otDateInput = document.getElementById('ot-date');
     const otStartTimeInput = document.getElementById('ot-start-time');
     const otEndTimeInput = document.getElementById('ot-end-time');
     const otDescriptionInput = document.getElementById('ot-description');
-    const otList = document.getElementById('ot-list');
-    const summaryFilterButtons = document.querySelectorAll('.summary-filter .btn');
-    const otSummaryDisplay = document.getElementById('ot-summary-display');
+    const otListBody = document.getElementById('ot-list-body');
+    const noRecordsMsg = document.getElementById('no-records-msg');
+    const appAlert = document.getElementById('app-alert');
 
+    // --- Summary Display Elements ---
+    const summaryDailyHours = document.getElementById('summary-daily-hours');
+    const summaryDailyEarnings = document.getElementById('summary-daily-earnings');
+    const summaryMonthlyHours = document.getElementById('summary-monthly-hours');
+    const summaryMonthlyEarnings = document.getElementById('summary-monthly-earnings');
+    const summaryYearlyHours = document.getElementById('summary-yearly-hours');
+    const summaryYearlyEarnings = document.getElementById('summary-yearly-earnings');
+
+    // --- Data Storage & Defaults ---
     let otRecords = JSON.parse(localStorage.getItem('otRecords')) || [];
+    let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
+        hourlyRate: 0,
+        otMultiplier: 1.5 // Default OT multiplier
+    };
 
-    // Function to save records to Local Storage
+    // --- Utility Functions ---
     const saveRecords = () => {
         localStorage.setItem('otRecords', JSON.stringify(otRecords));
     };
 
-    // Function to render OT records
-    const renderOTRecords = () => {
-        otList.innerHTML = '';
-        if (otRecords.length === 0) {
-            otList.innerHTML = '<p style="text-align: center; color: #777;">ยังไม่มีการบันทึก OT</p>';
-            return;
-        }
-        otRecords.forEach((record, index) => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <div class="ot-details">
-                    <strong>วันที่: ${record.date}</strong>
-                    <small>เวลา: ${record.startTime} - ${record.endTime}</small>
-                    <small>รวม: ${record.duration} ชั่วโมง</small>
-                    ${record.description ? `<small>รายละเอียด: ${record.description}</small>` : ''}
-                </div>
-                <button class="delete-btn" data-index="${index}">ลบ</button>
-            `;
-            otList.appendChild(listItem);
-        });
-        addDeleteListeners();
+    const saveSettings = () => {
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
+        loadSettings(); // Reload settings into UI
     };
 
-    // Function to add event listeners to delete buttons
-    const addDeleteListeners = () => {
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const indexToDelete = parseInt(e.target.dataset.index);
-                otRecords.splice(indexToDelete, 1);
-                saveRecords();
-                renderOTRecords();
-                updateSummary(); // Update summary after deletion
-            });
-        });
+    const showAlert = (message, type = 'error') => {
+        appAlert.textContent = message;
+        appAlert.className = `app-alert ${type}`;
+        appAlert.classList.remove('hidden');
+        setTimeout(() => {
+            appAlert.classList.add('hidden');
+        }, 5000); // Hide after 5 seconds
     };
 
-    // Function to calculate OT duration
     const calculateOTDuration = (startTime, endTime) => {
         const start = new Date(`2000/01/01 ${startTime}`);
         const end = new Date(`2000/01/01 ${endTime}`);
@@ -75,58 +75,138 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const diffMs = end - start; // milliseconds
         const diffHours = diffMs / (1000 * 60 * 60); // hours
-        return diffHours.toFixed(2);
+        return parseFloat(diffHours.toFixed(2));
     };
 
-    // Function to update the summary display
-    const updateSummary = (filter = 'daily') => {
-        let totalHours = 0;
-        let filteredRecords = [];
-        const today = new Date().toISOString().slice(0, 10); //YYYY-MM-DD
-
-        if (filter === 'daily') {
-            filteredRecords = otRecords.filter(record => record.date === today);
-            otSummaryDisplay.innerHTML = `<h3>สรุป OT ประจำวันนี้ (${today})</h3>`;
-        } else if (filter === 'monthly') {
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            filteredRecords = otRecords.filter(record => {
-                const recordDate = new Date(record.date);
-                return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
-            });
-            otSummaryDisplay.innerHTML = `<h3>สรุป OT ประจำเดือนนี้ (${new Date().toLocaleString('th-TH', { month: 'long', year: 'numeric' })})</h3>`;
-        } else if (filter === 'yearly') {
-            const currentYear = new Date().getFullYear();
-            filteredRecords = otRecords.filter(record => {
-                const recordDate = new Date(record.date);
-                return recordDate.getFullYear() === currentYear;
-            });
-            otSummaryDisplay.innerHTML = `<h3>สรุป OT ประจำปีนี้ (${currentYear})</h3>`;
+    const calculateEarnings = (hours) => {
+        const rate = parseFloat(appSettings.hourlyRate);
+        const multiplier = parseFloat(appSettings.otMultiplier);
+        if (isNaN(rate) || rate <= 0) {
+            return 0;
         }
+        return parseFloat((hours * rate * multiplier).toFixed(2));
+    };
 
-        if (filteredRecords.length === 0) {
-            otSummaryDisplay.innerHTML += '<p>ยังไม่มีข้อมูล OT สำหรับช่วงเวลานี้</p>';
+    // --- UI Logic ---
+    const showSection = (sectionToShow) => {
+        [settingsSection, summarySection, addOtSection, historySection].forEach(section => {
+            section.classList.add('hidden');
+        });
+        sectionToShow.classList.remove('hidden');
+    };
+
+    const loadSettings = () => {
+        hourlyRateInput.value = appSettings.hourlyRate || '';
+        otMultiplierInput.value = appSettings.otMultiplier || '';
+    };
+
+    const renderOTRecords = () => {
+        otListBody.innerHTML = '';
+        if (otRecords.length === 0) {
+            noRecordsMsg.classList.remove('hidden');
+            return;
+        }
+        noRecordsMsg.classList.add('hidden');
+
+        otRecords.forEach((record, index) => {
+            const tableRow = document.createElement('tr');
+            tableRow.innerHTML = `
+                <td>${record.date}</td>
+                <td>${record.duration.toFixed(2)} ชม.</td>
+                <td>${record.earnings.toFixed(2)} ฿</td>
+                <td>${record.description || '-'}</td>
+                <td>
+                    <button class="delete-btn" data-index="${index}">ลบ</button>
+                </td>
+            `;
+            otListBody.appendChild(tableRow);
+        });
+        addDeleteListeners();
+    };
+
+    const addDeleteListeners = () => {
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const indexToDelete = parseInt(e.target.dataset.index);
+                otRecords.splice(indexToDelete, 1);
+                saveRecords();
+                renderOTRecords();
+                updateSummary();
+                showAlert('ลบรายการ OT แล้ว', 'success');
+            });
+        });
+    };
+
+    const updateSummary = () => {
+        const today = new Date().toISOString().slice(0, 10); //YYYY-MM-DD
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        let dailyHours = 0;
+        let dailyEarnings = 0;
+        let monthlyHours = 0;
+        let monthlyEarnings = 0;
+        let yearlyHours = 0;
+        let yearlyEarnings = 0;
+
+        otRecords.forEach(record => {
+            const recordDate = new Date(record.date);
+            const recordHours = parseFloat(record.duration);
+            const recordEarnings = parseFloat(record.earnings);
+
+            if (record.date === today) {
+                dailyHours += recordHours;
+                dailyEarnings += recordEarnings;
+            }
+            if (recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear) {
+                monthlyHours += recordHours;
+                monthlyEarnings += recordEarnings;
+            }
+            if (recordDate.getFullYear() === currentYear) {
+                yearlyHours += recordHours;
+                yearlyEarnings += recordEarnings;
+            }
+        });
+
+        summaryDailyHours.textContent = dailyHours.toFixed(2);
+        summaryDailyEarnings.textContent = dailyEarnings.toFixed(2);
+        summaryMonthlyHours.textContent = monthlyHours.toFixed(2);
+        summaryMonthlyEarnings.textContent = monthlyEarnings.toFixed(2);
+        summaryYearlyHours.textContent = yearlyHours.toFixed(2);
+        summaryYearlyEarnings.textContent = yearlyEarnings.toFixed(2);
+    };
+
+    // --- Event Listeners ---
+    settingsBtn.addEventListener('click', () => {
+        showSection(settingsSection);
+        loadSettings();
+    });
+
+    saveSettingsBtn.addEventListener('click', () => {
+        const newHourlyRate = parseFloat(hourlyRateInput.value);
+        const newOtMultiplier = parseFloat(otMultiplierInput.value);
+
+        if (isNaN(newHourlyRate) || newHourlyRate < 0) {
+            showAlert('กรุณากรอกค่าแรงต่อชั่วโมงที่เป็นตัวเลขและไม่ติดลบ', 'error');
+            return;
+        }
+        if (isNaN(newOtMultiplier) || newOtMultiplier < 1) {
+            showAlert('กรุณากรอกอัตรา OT ที่เป็นตัวเลขและไม่น้อยกว่า 1', 'error');
             return;
         }
 
-        filteredRecords.forEach(record => {
-            totalHours += parseFloat(record.duration);
-        });
+        appSettings.hourlyRate = newHourlyRate;
+        appSettings.otMultiplier = newOtMultiplier;
+        saveSettings();
+        updateSummary(); // Update summary if rates changed
+        showAlert('บันทึกการตั้งค่าแล้ว', 'success');
+        showSection(summarySection); // Go back to summary
+    });
 
-        otSummaryDisplay.innerHTML += `<p><strong>รวมเวลา OT ทั้งหมด: ${totalHours.toFixed(2)} ชั่วโมง</strong></p>`;
-        
-        // Optionally display details for filtered records
-        if (filter === 'daily') { // Only show details for daily view to avoid clutter
-            otSummaryDisplay.innerHTML += '<h4>รายละเอียด:</h4>';
-            otSummaryDisplay.innerHTML += '<ul>';
-            filteredRecords.forEach(record => {
-                otSummaryDisplay.innerHTML += `<li>${record.date} ${record.startTime}-${record.endTime} (${record.duration} ชม.) ${record.description ? ` - ${record.description}` : ''}</li>`;
-            });
-            otSummaryDisplay.innerHTML += '</ul>';
-        }
-    };
+    cancelSettingsBtn.addEventListener('click', () => {
+        showSection(summarySection); // Go back to summary
+    });
 
-    // Event Listener for Form Submission
     otForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -135,31 +215,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const endTime = otEndTimeInput.value;
         const description = otDescriptionInput.value.trim();
 
+        if (appSettings.hourlyRate <= 0 || isNaN(appSettings.hourlyRate)) {
+            showAlert('กรุณาตั้งค่า "ค่าแรงต่อชั่วโมง" ในหน้าตั้งค่าก่อนบันทึก OT', 'error');
+            return;
+        }
+
         if (date && startTime && endTime) {
             const duration = calculateOTDuration(startTime, endTime);
-            const newRecord = { date, startTime, endTime, duration, description };
+            const earnings = calculateEarnings(duration);
+
+            const newRecord = { date, startTime, endTime, duration, description, earnings };
             otRecords.unshift(newRecord); // Add to the beginning
             saveRecords();
             renderOTRecords();
-            updateSummary('daily'); // Update daily summary after adding new record
+            updateSummary();
             otForm.reset(); // Clear the form
+            otDateInput.value = new Date().toISOString().slice(0, 10); // Reset date to today
+            showAlert('บันทึก OT สำเร็จ!', 'success');
         } else {
-            alert('กรุณากรอกข้อมูล วันที่, เวลาเริ่มต้น และเวลาสิ้นสุด ให้ครบถ้วน');
+            showAlert('กรุณากรอกข้อมูล วันที่, เวลาเริ่มต้น และเวลาสิ้นสุด ให้ครบถ้วน', 'error');
         }
     });
 
-    // Event Listener for Summary Filter Buttons
-    summaryFilterButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            summaryFilterButtons.forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            updateSummary(e.target.dataset.filter);
-        });
-    });
-
-    // Initial render and summary update
+    // --- Initial Load ---
+    loadSettings();
     renderOTRecords();
-    // Set current date to the input field initially
-    otDateInput.value = new Date().toISOString().slice(0, 10);
-    updateSummary('daily');
+    updateSummary();
+    otDateInput.value = new Date().toISOString().slice(0, 10); // Set current date to the input field initially
+    showSection(summarySection); // Show summary section first
 });

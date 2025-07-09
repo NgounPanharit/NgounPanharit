@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ot-tracker-v1';
+const CACHE_NAME = 'ot-tracker-pro-v2'; // Changed cache name for new version
 const urlsToCache = [
     './',
     './index.html',
@@ -6,7 +6,8 @@ const urlsToCache = [
     './script.js',
     './manifest.json',
     './icons/icon-192x192.png',
-    './icons/icon-512x512.png'
+    './icons/icon-512x512.png',
+    'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap' // Cache Google Font
 ];
 
 // ติดตั้ง Service Worker และ Cache ไฟล์

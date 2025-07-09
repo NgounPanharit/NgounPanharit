@@ -1,11 +1,11 @@
 {
-    "name": "บันทึก OT ของฉัน",
-    "short_name": "OT Tracker",
-    "description": "แอปพลิเคชันสำหรับบันทึกและสรุปเวลา OT",
+    "name": "OT Tracker Pro",
+    "short_name": "OT Pro",
+    "description": "แอปพลิเคชันสำหรับบันทึกและสรุปเวลา OT พร้อมคำนวณรายรับ",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#2ecc71",
+    "background_color": "#282c34",
+    "theme_color": "#61dafb",
     "icons": [
         {
             "src": "icons/icon-192x192.png",

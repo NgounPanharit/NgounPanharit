@@ -3,54 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บันทึก OT ของฉัน</title>
+    <title>OT Tracker Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>บันทึก OT ของฉัน</h1>
+        <header class="app-header">
+            <h1>OT Tracker Pro</h1>
+            <div class="header-settings">
+                <button id="settings-btn" class="icon-btn" aria-label="Settings">&#9881;</button> </div>
+        </header>
 
-        <div class="form-section">
-            <h2>บันทึก OT ใหม่</h2>
-            <form id="ot-form">
-                <div class="form-group">
-                    <label for="ot-date">วันที่:</label>
-                    <input type="date" id="ot-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="ot-start-time">เวลาเริ่ม:</label>
-                    <input type="time" id="ot-start-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="ot-end-time">เวลาสิ้นสุด:</label>
-                    <input type="time" id="ot-end-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="ot-description">รายละเอียด (ถ้ามี):</label>
-                    <input type="text" id="ot-description" placeholder="งานที่ทำ OT">
-                </div>
-                <button type="submit" class="btn btn-primary">บันทึก OT</button>
-            </form>
-        </div>
+        <div id="app-alert" class="app-alert hidden"></div>
 
-        <div class="summary-section">
-            <h2>สรุป OT</h2>
-            <div class="summary-filter">
-                <button class="btn btn-filter active" data-filter="daily">รายวัน</button>
-                <button class="btn btn-filter" data-filter="monthly">รายเดือน</button>
-                <button class="btn btn-filter" data-filter="yearly">รายปี</button>
+        <section id="settings-section" class="app-section hidden">
+            <h2>ตั้งค่า</h2>
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="hourly-rate">ค่าแรงต่อชั่วโมง (บาท):</label>
+                    <input type="number" id="hourly-rate" placeholder="เช่น 150" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="ot-multiplier">อัตรา OT (เท่า):</label>
+                    <input type="number" id="ot-multiplier" placeholder="เช่น 1.5" min="1" step="0.1">
+                </div>
+                <button id="save-settings-btn" class="btn btn-secondary">บันทึก</button>
+                <button id="cancel-settings-btn" class="btn btn-outline">ยกเลิก</button>
             </div>
+        </section>
 
-            <div id="ot-summary-display">
+        <section id="summary-section" class="app-section">
+            <h2>สรุป OT</h2>
+            <div class="summary-cards">
+                <div class="summary-card" data-filter="daily">
+                    <div class="card-icon">&#128197;</div> <h3>สรุปวันนี้</h3>
+                    <p>ชั่วโมง: <span id="summary-daily-hours">0.00</span> ชม.</p>
+                    <p>รายรับ: <span id="summary-daily-earnings">0.00</span> ฿</p>
                 </div>
-        </div>
+                <div class="summary-card" data-filter="monthly">
+                    <div class="card-icon">&#128198;</div> <h3>สรุปเดือนนี้</h3>
+                    <p>ชั่วโมง: <span id="summary-monthly-hours">0.00</span> ชม.</p>
+                    <p>รายรับ: <span id="summary-monthly-earnings">0.00</span> ฿</p>
+                </div>
+                <div class="summary-card" data-filter="yearly">
+                    <div class="card-icon">&#128197;</div> <h3>สรุปปีนี้</h3>
+                    <p>ชั่วโมง: <span id="summary-yearly-hours">0.00</span> ชม.</p>
+                    <p>รายรับ: <span id="summary-yearly-earnings">0.00</span> ฿</p>
+                </div>
+            </div>
+        </section>
 
-        <div class="record-list-section">
-            <h2>รายการบันทึก OT ทั้งหมด</h2>
-            <ul id="ot-list">
-                </ul>
-        </div>
+        <section id="add-ot-section" class="app-section">
+            <h2>เพิ่มรายการ OT</h2>
+            <div class="form-section">
+                <form id="ot-form">
+                    <div class="form-group">
+                        <label for="ot-date">วันที่:</label>
+                        <input type="date" id="ot-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ot-start-time">เวลาเริ่ม:</label>
+                        <input type="time" id="ot-start-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ot-end-time">เวลาสิ้นสุด:</label>
+                        <input type="time" id="ot-end-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ot-description">หมายเหตุ (ไม่บังคับ):</label>
+                        <input type="text" id="ot-description" placeholder="เช่น ปิดโปรเจกต์ด่วน">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">+</span> บันทึก OT
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="history-section" class="app-section">
+            <h2>ประวัติการทำ OT</h2>
+            <div class="ot-history-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>วันที่</th>
+                            <th>ชั่วโมง</th>
+                            <th>รายรับ</th>
+                            <th>หมายเหตุ</th>
+                            <th></th> </tr>
+                    </thead>
+                    <tbody id="ot-list-body">
+                        </tbody>
+                </table>
+            </div>
+            <p id="no-records-msg" class="text-center hidden">ยังไม่มีการบันทึก OT</p>
+        </section>
+
     </div>
 
     <script src="script.js"></script>

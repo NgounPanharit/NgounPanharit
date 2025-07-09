@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึก OT ของฉัน</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>บันทึก OT ของฉัน</h1>
+
+        <div class="form-section">
+            <h2>บันทึก OT ใหม่</h2>
+            <form id="ot-form">
+                <div class="form-group">
+                    <label for="ot-date">วันที่:</label>
+                    <input type="date" id="ot-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="ot-start-time">เวลาเริ่ม:</label>
+                    <input type="time" id="ot-start-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="ot-end-time">เวลาสิ้นสุด:</label>
+                    <input type="time" id="ot-end-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="ot-description">รายละเอียด (ถ้ามี):</label>
+                    <input type="text" id="ot-description" placeholder="งานที่ทำ OT">
+                </div>
+                <button type="submit" class="btn btn-primary">บันทึก OT</button>
+            </form>
+        </div>
+
+        <div class="summary-section">
+            <h2>สรุป OT</h2>
+            <div class="summary-filter">
+                <button class="btn btn-filter active" data-filter="daily">รายวัน</button>
+                <button class="btn btn-filter" data-filter="monthly">รายเดือน</button>
+                <button class="btn btn-filter" data-filter="yearly">รายปี</button>
+            </div>
+
+            <div id="ot-summary-display">
+                </div>
+        </div>
+
+        <div class="record-list-section">
+            <h2>รายการบันทึก OT ทั้งหมด</h2>
+            <ul id="ot-list">
+                </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

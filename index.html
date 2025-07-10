@@ -3,106 +3,886 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OT Tracker Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>ระบบบันทึกการทำงานล่วงเวลา (OT)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .card-subtitle {
+            color: var(--gray);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+        
+        .records-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+        }
+        
+        .record-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .record-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        
+        .record-info {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+        
+        .record-date {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .record-hours {
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .record-desc {
+            grid-column: 1 / span 2;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .record-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn.edit:hover {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .action-btn.delete:hover {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .summary-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+        }
+        
+        .summary-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .summary-chart {
+            height: 250px;
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 20px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bar-value {
+            background: var(--primary);
+            width: 100%;
+            border-radius: 5px 5px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .bar-label {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table th,
+        .summary-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .summary-table th {
+            background: var(--light);
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .summary-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--primary);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-select {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header class="app-header">
-            <h1>OT Tracker Pro</h1>
-            <div class="header-settings">
-                <button id="settings-btn" class="icon-btn" aria-label="Settings">&#9881;</button> </div>
+        <header>
+            <h1><i class="fas fa-clock"></i> ระบบบันทึกการทำงานล่วงเวลา (OT)</h1>
+            <p>บันทึก สรุป และตรวจสอบข้อมูลการทำงานล่วงเวลาได้อย่างง่ายดาย</p>
         </header>
-
-        <div id="app-alert" class="app-alert hidden"></div>
-
-        <section id="settings-section" class="app-section hidden">
-            <h2>ตั้งค่า</h2>
-            <div class="form-section">
-                <div class="form-group">
-                    <label for="hourly-rate">ค่าแรงต่อชั่วโมง (บาท):</label>
-                    <input type="number" id="hourly-rate" placeholder="เช่น 150" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="ot-multiplier">อัตรา OT (เท่า):</label>
-                    <input type="number" id="ot-multiplier" placeholder="เช่น 1.5" min="1" step="0.1">
-                </div>
-                <button id="save-settings-btn" class="btn btn-secondary">บันทึก</button>
-                <button id="cancel-settings-btn" class="btn btn-outline">ยกเลิก</button>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-calendar-day"></i> ชั่วโมง OT วันนี้</div>
+                <div class="card-value">2.5</div>
+                <div class="card-subtitle">ชั่วโมง</div>
             </div>
-        </section>
-
-        <section id="summary-section" class="app-section">
-            <h2>สรุป OT</h2>
-            <div class="summary-cards">
-                <div class="summary-card" data-filter="daily">
-                    <div class="card-icon">&#128197;</div> <h3>สรุปวันนี้</h3>
-                    <p>ชั่วโมง: <span id="summary-daily-hours">0.00</span> ชม.</p>
-                    <p>รายรับ: <span id="summary-daily-earnings">0.00</span> ฿</p>
-                </div>
-                <div class="summary-card" data-filter="monthly">
-                    <div class="card-icon">&#128198;</div> <h3>สรุปเดือนนี้</h3>
-                    <p>ชั่วโมง: <span id="summary-monthly-hours">0.00</span> ชม.</p>
-                    <p>รายรับ: <span id="summary-monthly-earnings">0.00</span> ฿</p>
-                </div>
-                <div class="summary-card" data-filter="yearly">
-                    <div class="card-icon">&#128197;</div> <h3>สรุปปีนี้</h3>
-                    <p>ชั่วโมง: <span id="summary-yearly-hours">0.00</span> ชม.</p>
-                    <p>รายรับ: <span id="summary-yearly-earnings">0.00</span> ฿</p>
-                </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-calendar-week"></i> ชั่วโมง OT เดือนนี้</div>
+                <div class="card-value">24.0</div>
+                <div class="card-subtitle">ชั่วโมง</div>
             </div>
-        </section>
-
-        <section id="add-ot-section" class="app-section">
-            <h2>เพิ่มรายการ OT</h2>
-            <div class="form-section">
-                <form id="ot-form">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-calendar-alt"></i> ชั่วโมง OT ปีนี้</div>
+                <div class="card-value">156.5</div>
+                <div class="card-subtitle">ชั่วโมง</div>
+            </div>
+        </div>
+        
+        <div class="app-container">
+            <div class="form-container">
+                <h2 class="form-title"><i class="fas fa-plus-circle"></i> บันทึกการทำงาน OT</h2>
+                <form id="otForm">
                     <div class="form-group">
-                        <label for="ot-date">วันที่:</label>
-                        <input type="date" id="ot-date" required>
+                        <label for="otDate">วันที่</label>
+                        <input type="date" id="otDate" class="form-control" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="ot-start-time">เวลาเริ่ม:</label>
-                        <input type="time" id="ot-start-time" required>
+                        <label for="otHours">จำนวนชั่วโมง OT</label>
+                        <input type="number" id="otHours" class="form-control" min="0.5" max="24" step="0.5" placeholder="เช่น 1.5, 2.0, 3.5" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="ot-end-time">เวลาสิ้นสุด:</label>
-                        <input type="time" id="ot-end-time" required>
+                        <label for="otDescription">รายละเอียดการทำงาน</label>
+                        <textarea id="otDescription" class="form-control" rows="3" placeholder="อธิบายงานที่ทำในช่วง OT" required></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="ot-description">หมายเหตุ (ไม่บังคับ):</label>
-                        <input type="text" id="ot-description" placeholder="เช่น ปิดโปรเจกต์ด่วน">
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <span class="btn-icon">+</span> บันทึก OT
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> บันทึกข้อมูล
                     </button>
                 </form>
             </div>
-        </section>
-
-        <section id="history-section" class="app-section">
-            <h2>ประวัติการทำ OT</h2>
-            <div class="ot-history-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>วันที่</th>
-                            <th>ชั่วโมง</th>
-                            <th>รายรับ</th>
-                            <th>หมายเหตุ</th>
-                            <th></th> </tr>
-                    </thead>
-                    <tbody id="ot-list-body">
-                        </tbody>
-                </table>
+            
+            <div class="records-container">
+                <div class="section-header">
+                    <h2 class="form-title"><i class="fas fa-history"></i> รายการบันทึก OT</h2>
+                    <div class="filter-group">
+                        <select id="monthFilter" class="filter-select">
+                            <option value="all">ทุกเดือน</option>
+                            <!-- Months will be populated by JavaScript -->
+                        </select>
+                        <select id="yearFilter" class="filter-select">
+                            <option value="all">ทุกปี</option>
+                            <!-- Years will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="record-list" id="recordList">
+                    <!-- Records will be populated by JavaScript -->
+                </div>
             </div>
-            <p id="no-records-msg" class="text-center hidden">ยังไม่มีการบันทึก OT</p>
-        </section>
-
+        </div>
+        
+        <div class="summary-container">
+            <h2 class="summary-title"><i class="fas fa-chart-bar"></i> สรุปชั่วโมง OT รายเดือน</h2>
+            <div class="summary-chart" id="summaryChart">
+                <!-- Chart bars will be populated by JavaScript -->
+            </div>
+            
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>เดือน</th>
+                        <th>ชั่วโมง OT</th>
+                        <th>จำนวนวัน</th>
+                        <th>ค่า OT โดยประมาณ</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTableBody">
+                    <!-- Summary data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 ระบบบันทึกการทำงานล่วงเวลา (OT) | พัฒนาโดยทีม HR</p>
+        </div>
     </div>
-
-    <script src="script.js"></script>
+    
+    <div class="notification" id="notification">
+        ข้อความแจ้งเตือน
+    </div>
+    
+    <script>
+        // Sample data for demonstration
+        const sampleRecords = [
+            { id: 1, date: '2023-10-15', hours: 2.0, description: 'ทำงานโปรเจคพิเศษ' },
+            { id: 2, date: '2023-10-18', hours: 3.5, description: 'แก้ไขบั๊กระบบ' },
+            { id: 3, date: '2023-10-20', hours: 1.5, description: 'ประชุมกับทีมต่างประเทศ' },
+            { id: 4, date: '2023-10-25', hours: 4.0, description: 'อัพเดทระบบหลังเลิกงาน' },
+            { id: 5, date: '2023-11-05', hours: 2.5, description: 'เตรียมรายงานประจำเดือน' },
+            { id: 6, date: '2023-11-10', hours: 3.0, description: 'อบรมพนักงานใหม่' }
+        ];
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load records from local storage or use sample data
+            let records = JSON.parse(localStorage.getItem('otRecords')) || sampleRecords;
+            
+            // Initialize date filter options
+            initDateFilters(records);
+            
+            // Render records
+            renderRecords(records);
+            
+            // Render summary
+            renderSummary(records);
+            
+            // Handle form submission
+            document.getElementById('otForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewRecord();
+            });
+            
+            // Handle filter changes
+            document.getElementById('monthFilter').addEventListener('change', function() {
+                filterRecords();
+            });
+            
+            document.getElementById('yearFilter').addEventListener('change', function() {
+                filterRecords();
+            });
+        });
+        
+        // Initialize date filters
+        function initDateFilters(records) {
+            const monthFilter = document.getElementById('monthFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            
+            // Get unique months and years from records
+            const months = [...new Set(records.map(record => new Date(record.date).getMonth()))];
+            const years = [...new Set(records.map(record => new Date(record.date).getFullYear()))];
+            
+            // Add month options
+            const monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            
+            months.sort().forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = monthNames[month];
+                monthFilter.appendChild(option);
+            });
+            
+            // Add year options
+            years.sort().forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+        }
+        
+        // Add new record
+        function addNewRecord() {
+            const dateInput = document.getElementById('otDate');
+            const hoursInput = document.getElementById('otHours');
+            const descInput = document.getElementById('otDescription');
+            
+            const newRecord = {
+                id: Date.now(), // Generate unique ID
+                date: dateInput.value,
+                hours: parseFloat(hoursInput.value),
+                description: descInput.value
+            };
+            
+            // Add to records array
+            let records = JSON.parse(localStorage.getItem('otRecords')) || [];
+            records.push(newRecord);
+            
+            // Save to local storage
+            localStorage.setItem('otRecords', JSON.stringify(records));
+            
+            // Show success notification
+            showNotification('บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+            
+            // Reset form
+            dateInput.value = '';
+            hoursInput.value = '';
+            descInput.value = '';
+            
+            // Update UI
+            renderRecords(records);
+            renderSummary(records);
+            updateDashboard(records);
+        }
+        
+        // Render records
+        function renderRecords(records) {
+            const recordList = document.getElementById('recordList');
+            
+            // Filter records based on selected month and year
+            const filteredRecords = filterRecords();
+            
+            if (filteredRecords.length === 0) {
+                recordList.innerHTML = '<div class="no-records"><i class="fas fa-inbox fa-2x"></i><p>ไม่พบรายการบันทึก OT</p></div>';
+                return;
+            }
+            
+            // Sort records by date (newest first)
+            filteredRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '';
+            filteredRecords.forEach(record => {
+                const date = new Date(record.date);
+                const formattedDate = date.toLocaleDateString('th-TH', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                html += `
+                    <div class="record-item" data-id="${record.id}">
+                        <div class="record-info">
+                            <div class="record-date">${formattedDate}</div>
+                            <div class="record-hours">${record.hours} ชม.</div>
+                            <div class="record-desc">${record.description}</div>
+                        </div>
+                        <div class="record-actions">
+                            <button class="action-btn edit" onclick="editRecord(${record.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteRecord(${record.id})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            recordList.innerHTML = html;
+        }
+        
+        // Filter records based on selected month and year
+        function filterRecords() {
+            const monthFilter = document.getElementById('monthFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            let records = JSON.parse(localStorage.getItem('otRecords')) || sampleRecords;
+            
+            if (monthFilter === 'all' && yearFilter === 'all') {
+                return records;
+            }
+            
+            return records.filter(record => {
+                const date = new Date(record.date);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                
+                return (monthFilter === 'all' || month == monthFilter) && 
+                       (yearFilter === 'all' || year == yearFilter);
+            });
+        }
+        
+        // Render summary
+        function renderSummary(records) {
+            const summaryChart = document.getElementById('summaryChart');
+            const summaryTableBody = document.getElementById('summaryTableBody');
+            
+            // Group records by month
+            const monthlySummary = {};
+            
+            records.forEach(record => {
+                const date = new Date(record.date);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                const monthYear = `${year}-${month}`;
+                
+                if (!monthlySummary[monthYear]) {
+                    monthlySummary[monthYear] = {
+                        month: month,
+                        year: year,
+                        totalHours: 0,
+                        days: 0,
+                        records: []
+                    };
+                }
+                
+                monthlySummary[monthYear].totalHours += record.hours;
+                monthlySummary[monthYear].days++;
+                monthlySummary[monthYear].records.push(record);
+            });
+            
+            // Convert to array and sort by year/month
+            const summaryArray = Object.values(monthlySummary);
+            summaryArray.sort((a, b) => {
+                if (a.year !== b.year) return b.year - a.year;
+                return b.month - a.month;
+            });
+            
+            // Render chart
+            let chartHtml = '';
+            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+                               'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            
+            // Get last 6 months for chart
+            const last6Months = [];
+            const today = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                last6Months.push({
+                    month: date.getMonth(),
+                    year: date.getFullYear(),
+                    label: `${monthNames[date.getMonth()]} ${date.getFullYear() + 543}`
+                });
+            }
+            
+            // Find max hours for chart scaling
+            let maxHours = 50; // default max
+            last6Months.forEach(month => {
+                const monthYear = `${month.year}-${month.month}`;
+                const data = monthlySummary[monthYear];
+                if (data && data.totalHours > maxHours) {
+                    maxHours = Math.ceil(data.totalHours / 10) * 10; // round up to nearest 10
+                }
+            });
+            
+            // Create chart bars
+            last6Months.forEach(month => {
+                const monthYear = `${month.year}-${month.month}`;
+                const data = monthlySummary[monthYear];
+                const hours = data ? data.totalHours : 0;
+                const height = (hours / maxHours) * 100;
+                
+                chartHtml += `
+                    <div class="chart-bar">
+                        <div class="bar-value" style="height: ${height}%;"></div>
+                        <div class="bar-label">${month.label}</div>
+                    </div>
+                `;
+            });
+            
+            summaryChart.innerHTML = chartHtml;
+            
+            // Render table
+            let tableHtml = '';
+            summaryArray.forEach(item => {
+                const monthName = monthNames[item.month];
+                const hourlyRate = 100; // 100 บาทต่อชั่วโมง
+                const estimatedPay = item.totalHours * hourlyRate;
+                
+                tableHtml += `
+                    <tr>
+                        <td>${monthName} ${item.year + 543}</td>
+                        <td>${item.totalHours.toFixed(1)} ชม.</td>
+                        <td>${item.days} วัน</td>
+                        <td>${estimatedPay.toLocaleString('th-TH')} บาท</td>
+                    </tr>
+                `;
+            });
+            
+            summaryTableBody.innerHTML = tableHtml;
+        }
+        
+        // Update dashboard cards
+        function updateDashboard(records) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Calculate today's hours
+            const todayHours = records
+                .filter(record => record.date === today)
+                .reduce((sum, record) => sum + record.hours, 0);
+            
+            // Calculate this month's hours
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const monthHours = records
+                .filter(record => {
+                    const date = new Date(record.date);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                })
+                .reduce((sum, record) => sum + record.hours, 0);
+            
+            // Calculate this year's hours
+            const yearHours = records
+                .filter(record => {
+                    const date = new Date(record.date);
+                    return date.getFullYear() === currentYear;
+                })
+                .reduce((sum, record) => sum + record.hours, 0);
+            
+            // Update cards
+            document.querySelector('.dashboard .card:nth-child(1) .card-value').textContent = todayHours.toFixed(1);
+            document.querySelector('.dashboard .card:nth-child(2) .card-value').textContent = monthHours.toFixed(1);
+            document.querySelector('.dashboard .card:nth-child(3) .card-value').textContent = yearHours.toFixed(1);
+        }
+        
+        // Edit record
+        function editRecord(id) {
+            let records = JSON.parse(localStorage.getItem('otRecords')) || sampleRecords;
+            const record = records.find(r => r.id === id);
+            
+            if (record) {
+                // Populate form with record data
+                document.getElementById('otDate').value = record.date;
+                document.getElementById('otHours').value = record.hours;
+                document.getElementById('otDescription').value = record.description;
+                
+                // Remove the record
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('otRecords', JSON.stringify(records));
+                
+                // Show notification
+                showNotification('กรุณาแก้ไขข้อมูลและบันทึกใหม่', 'success');
+                
+                // Update UI
+                renderRecords(records);
+                renderSummary(records);
+                updateDashboard(records);
+            }
+        }
+        
+        // Delete record
+        function deleteRecord(id) {
+            if (confirm('คุณแน่ใจว่าต้องการลบรายการนี้?')) {
+                let records = JSON.parse(localStorage.getItem('otRecords')) || sampleRecords;
+                records = records.filter(record => record.id !== id);
+                localStorage.setItem('otRecords', JSON.stringify(records));
+                
+                // Show notification
+                showNotification('ลบรายการเรียบร้อยแล้ว', 'success');
+                
+                // Update UI
+                renderRecords(records);
+                renderSummary(records);
+                updateDashboard(records);
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.className = 'notification';
+            }, 3000);
+        }
+        
+        // Initialize with today's date
+        document.getElementById('otDate').value = new Date().toISOString().split('T')[0];
+        
+        // Initialize dashboard with sample data
+        updateDashboard(sampleRecords);
+    </script>
 </body>
 </html>
